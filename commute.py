@@ -1,7 +1,7 @@
 import pymysql, tokens_and_addresses, time
 import pandas as pd
 from pandas.io import sql
-
+import dbConnector
 
 class Commute:
     """
@@ -13,8 +13,7 @@ class Commute:
         drive_time_to_home_list      List of commute times from destination to home.
     """
     date_list = []
-    drive_time_from_home_list = []
-    drive_time_to_home_list = []
+    drive_time_start_to_dest_list = []
     drive_time_avg_from_home_list = []
     drive_time_avg_to_home_list = []
     drive_time_stdev_from_home_list = []
@@ -22,35 +21,14 @@ class Commute:
     analysis_result_str_list = []
     analysis_result_min_max_list = []
 
-    def __init__(self, table, from_home_db_column, to_home_db_column):
-        """
-        :param from_home_db_column: Name of database column containing commute times from
-         home to a destination
-        :type from_home_db_column: string
+    def __init__(self, start_location_id, dest_location_id):
+        self.start_location_id = start_location_id
+        self.dest_location_id = dest_location_id
+        self.session = dbConnector.createSession()
 
-        :param to_home_db_column: Name of database column containing commute times from
-         a destination to home.
-        :type to_home_db_column: string
-        """
-        self.table = table
-        self.from_home_db_column = from_home_db_column
-        self.to_home_db_column = to_home_db_column
-
-    def get_commute_data(self, num_records):
-        """
-        Retrieves commute data from database and assigns data to date_list, drive_time_from_home_list
-        and drive_time_to_home_list.
-
-        :param num_records: Number of database records to return
-        :type num_records: int
-        """
-        conn = pymysql.connect(host=tokens_and_addresses.sql_host, port=tokens_and_addresses.sql_port,
-                               user=tokens_and_addresses.sql_username, passwd=tokens_and_addresses.sql_password,
-                               db='commute2')
-
-        # query = "select * from commute2 order by id desc limit {}".format(str(num_records))
-        query = "select * from {} order by id desc limit {}".format(self.table, str(num_records))
-        commute_df = sql.read_sql_query(query, con=conn)
+    def get_commute_data(self,start_id, dest_id, num_records):
+        dbConnector.get_commutes(self.session)
+        dbConnector.get_commutes_path(self.session, start_id, dest_id)
 
         start_time = time.time()
 
@@ -89,9 +67,9 @@ class Commute:
         :type day_code: int
         '''
 
-        conn = pymysql.connect(host=tokens_and_addresses.sql_host, port=tokens_and_addresses.sql_port,
-                               user=tokens_and_addresses.sql_username, passwd=tokens_and_addresses.sql_password,
-                               db='commute2')
+        conn = pymysql.connect(host=tokens_and_addresses.sql['Host'], port=tokens_and_addresses.sql['Port'],
+                               user=tokens_and_addresses.sql['Username'], passwd=tokens_and_addresses.sql['Password'],
+                               db=tokens_and_addresses.sql['Database'])
         seconds_in_week = 60*60*24*7
         epoch_time_week_ago = time.time()-seconds_in_week
 
@@ -139,9 +117,9 @@ class Commute:
         :type day_code: int
         '''
 
-        conn = pymysql.connect(host=tokens_and_addresses.sql_host, port=tokens_and_addresses.sql_port,
-                               user=tokens_and_addresses.sql_username, passwd=tokens_and_addresses.sql_password,
-                               db='commute2')
+        conn = pymysql.connect(host=tokens_and_addresses.sql['Host'], port=tokens_and_addresses.sql['Port'],
+                               user=tokens_and_addresses.sql['Username'], passwd=tokens_and_addresses.sql['Password'],
+                               db=tokens_and_addresses.sql['Database'])
 
         avg_from_home = '{}{}'.format('avg_', self.from_home_db_column)
         avg_to_home = '{}{}'.format('avg_', self.to_home_db_column)
@@ -217,9 +195,9 @@ class Commute:
         :type num_records: int
         """
 
-        conn = pymysql.connect(host=tokens_and_addresses.sql_host, port=tokens_and_addresses.sql_port,
-                               user=tokens_and_addresses.sql_username, passwd=tokens_and_addresses.sql_password,
-                               db='commute2')
+        conn = pymysql.connect(host=tokens_and_addresses.sql['Host'], port=tokens_and_addresses.sql['Port'],
+                               user=tokens_and_addresses.sql['Username'], passwd=tokens_and_addresses.sql['Password'],
+                               db=tokens_and_addresses.sql['Database'])
 
         query = "select hour, minute, day_code, {}, {} from {} " \
                 "order by id desc limit {}".format(self.from_home_db_column, self.to_home_db_column, self.table, str(num_records))

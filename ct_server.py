@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 db_column_list_from_home = tokens_and_addresses.db_column_list_from_home
 db_column_list_to_home = tokens_and_addresses.db_column_list_to_home
-location = tokens_and_addresses.location_list[0]  # Default to first on list
+location = tokens_and_addresses.locations[0]['Label']  # Default to first on list
 
 
 @app.errorhandler(404)
@@ -28,7 +28,7 @@ def get_default_commute_plot():
         if dest in column:
             to_home_db_column = column
 
-    commute = Commute('commute2', from_home_db_column, to_home_db_column)
+    commute = Commute(tokens_and_addresses.sql['Database'], from_home_db_column, to_home_db_column)
     commute.get_commute_data(5000)
 
     processing_time = time.time() - start_time
@@ -60,7 +60,7 @@ def get_commute_plot(dest):
         if dest in column:
             to_home_db_column = column
 
-    commute = Commute('commute2', from_home_db_column, to_home_db_column)
+    commute = Commute(tokens_and_addresses.sql['Database'], from_home_db_column, to_home_db_column)
     commute.get_commute_data(5000)
 
     processing_time = time.time() - start_time
@@ -92,7 +92,7 @@ def get_commute_plot_num(dest, num):
         if dest in column:
             to_home_db_column = column
 
-    commute = Commute('commute2', from_home_db_column, to_home_db_column)
+    commute = Commute(tokens_and_addresses.sql['Database'], from_home_db_column, to_home_db_column)
     commute.get_commute_data(num)
 
     processing_time = time.time() - start_time
@@ -125,7 +125,7 @@ def get_commute_plot_by_day(dest, day_code):
         if dest in column:
             to_home_db_column = column
 
-    commute = Commute('commute2', from_home_db_column, to_home_db_column)
+    commute = Commute(tokens_and_addresses.sql['Database'], from_home_db_column, to_home_db_column)
     commute.get_commute_data_by_day(2016, day_code)  # data collected at 5min rate, 2016 samples per week
 
     processing_time = time.time() - start_time
@@ -157,7 +157,7 @@ def get_commute_plot_by_day_avg(dest, day_code):
         if dest in column:
             to_home_db_column = column
 
-    commute = Commute('commute2', from_home_db_column, to_home_db_column)
+    commute = Commute(tokens_and_addresses.sql['Database'], from_home_db_column, to_home_db_column)
     commute.get_commute_average(100000, day_code)
 
     processing_time = time.time() - start_time
@@ -196,7 +196,7 @@ def get_analysis(dest):
         if dest in column:
             to_home_db_column = column
 
-    commute = Commute('commute2', from_home_db_column, to_home_db_column)
+    commute = Commute(tokens_and_addresses.sql['Database'], from_home_db_column, to_home_db_column)
     commute.get_commute_average(5000, 8)
     commute.get_commute_analysis(10000)
 

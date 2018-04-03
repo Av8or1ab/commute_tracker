@@ -1,12 +1,12 @@
 # Used to convert UTC times in database to local time
 
 import pymysql
-import tokens_and_addresses
+from tokens_and_addresses import sql
 import datetime
 
-db = pymysql.connect(host=tokens_and_addresses.sql_host, port=tokens_and_addresses.sql_port,
-                     user=tokens_and_addresses.sql_username, passwd=tokens_and_addresses.sql_password,
-                     db='commute2')
+db = pymysql.connect(host=sql['Host'], port=sql['Port'],
+                     user=sql['Username'], passwd=sql['Password'],
+                     db=sql['Datbase'])
 
 cursor = db.cursor()
 

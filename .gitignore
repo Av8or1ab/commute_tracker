@@ -1,3 +1,6 @@
 # IDEA config files
 .idea/
 /venv
+
+# Authentication files
+tokens_and_addresses.py
